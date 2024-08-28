@@ -23,7 +23,9 @@ const Signup = () => {
         role:"",
         file:""
     })
+    console.log("user se pehle");
     const {loading,user} = useSelector(store=> store.auth);
+   
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
@@ -32,7 +34,7 @@ const Signup = () => {
     }
     
     const ChangeFileHandler = (e) => {
-        setInput({  ...input, file: e.target.files ?.[0]})
+        setInput({  ...input, file: e.target.files[0] }); 
     }
 
     const submitHandler = async (e) => {
@@ -47,6 +49,7 @@ const Signup = () => {
             if(input.file){
                 formData.append("file",input.file);
             }
+            console.log("FORM DATA: ",formData);
 
             try {
                 dispatch(setLoading(true));
@@ -166,6 +169,7 @@ const Signup = () => {
                                     />
                                     <Label >Recruiter</Label>
                                 </div>
+
                             </RadioGroup>
                         </div>
                         <div className='flex items-center space-x-4'>

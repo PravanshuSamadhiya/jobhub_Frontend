@@ -6,33 +6,44 @@ import { Button } from '../ui/button'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { COMPANY_API_END_POINT } from '@/utils/constant'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { toast } from 'sonner'
 import { setSingleCompany } from '@/redux/companySlice'
 
-const CompanyCreate = () => {
-    const navigate = useNavigate();
-    const [companyName, setCompanyName] = useState()
-    const dispatch = useDispatch();
 
-    const registerNewCompany = async () => {
-        try {
-            const res = await axios.post(`${COMPANY_API_END_POINT}/register`, {companyName},{
-                headers:{
-                    'Content-Type':'application/json'
-                },
-                withCredentials: true
-            });
-            if(res?.data?.success){
-                dispatch(setSingleCompany(res.data.company));
-                toast.success(res.data.message);
-                const companyId = res?.data?.company?._id;
-                navigate(`/admin/companies/${companyId}`);
-            }
-        } catch (error) {
-            console.log(error);
+
+const CompanyCreate = () => {
+  const navigate = useNavigate();
+  const [companyName, setCompanyName] = useState('');
+  const dispatch = useDispatch();
+  const authState = useSelector(store => store.auth);
+  
+  const token = authState.user.token;
+  console.log("Token: ", token);
+
+  const registerNewCompany = async () => {
+    try {
+        const res = await axios.post(`${COMPANY_API_END_POINT}/register`, { companyName }, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            withCredentials: true
+        });
+        console.log("Response: ", res);
+        if (res?.data?.success) {
+            dispatch(setSingleCompany(res.data.company));
+            toast.success(res.data.message);
+            const companyId = res?.data?.company?._id;
+            navigate(`/admin/companies/${companyId}`);
+        } else {
+            toast.error(res?.data?.message || "Registration failed");
         }
+    } catch (error) {
+        console.error("Registration Error:", error.response?.data || error.message);
+        toast.error("An error occurred while registering the company");
     }
+};
 
   return (
     <div>

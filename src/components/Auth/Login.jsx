@@ -9,7 +9,7 @@ import axios from 'axios'
 import { toast } from 'sonner'
 import { Loader2 } from 'lucide-react'
 import { useDispatch, useSelector } from 'react-redux'
-import { setLoading, setUser } from '@/redux/authSlice'
+import { setLoading, setToken, setUser } from '@/redux/authSlice'
 
 
 const Login = () => {
@@ -39,9 +39,12 @@ const Login = () => {
             });
             if (res.data.success) {
                  dispatch(setUser(res.data.user));
+                 dispatch(setToken(res.data.user.token));
+
                 navigate("/");
                 toast.success(res.data.message);
             }
+        
         } catch (error) {
             console.log(error);
             toast.error(error.response.data.message);
@@ -121,7 +124,7 @@ const Login = () => {
                             </RadioGroup>
                         </div>
                         {
-                            loading ? <Button className='w-full my-4'><Loader2 className='mr-2 h-4 w-4 animate-spin' />Please wait</Button> : <Button type='submit' className='w-full my-5'>Signup</Button>
+                            loading ? <Button className='w-full my-4'><Loader2 className='mr-2 h-4 w-4 animate-spin' />Please wait</Button> : <Button type='submit' className='w-full my-5'>Login</Button>
                         }
                         <span className='text-sm'> Don't have an account?<Link to='/signup' className='text-blue-600'>Signup</Link></span>
                     </form>

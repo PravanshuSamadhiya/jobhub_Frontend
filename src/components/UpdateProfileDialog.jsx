@@ -13,7 +13,9 @@ import { setUser } from '@/redux/authSlice'
 const UpdateProfileDialog = ({ open, setOpen }) => {
     const [loading, setLoading] = useState(false);
     const { user } = useSelector(store => store.auth);
-
+    const authState = useSelector(store => store.auth);
+  
+    const token = authState.user.token;
     const [input, setInput] = useState({
         fullName: user?.fullName || "",
         email: user?.email || "",
@@ -49,7 +51,8 @@ const UpdateProfileDialog = ({ open, setOpen }) => {
             setLoading(true);
             const res = await axios.post(`${USER_API_END_POINT}/profile/update`, formData, {
                 headers: {
-                    'Content-Type': 'multipart/form-data'
+                    'Content-Type': 'multipart/form-data',
+                    'Authorization': `Bearer ${token}`
                 },
                 withCredentials: true
             });

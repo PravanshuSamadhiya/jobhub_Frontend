@@ -11,12 +11,19 @@ import axios from 'axios';
 const shortlistingStatus = ["Accepted", "Rejected"];
 
 const ApplicantsTable = () => {
-    const { applicants } = useSelector(store => store.application);
-
+    const { applicants } = useSelector(store => store.application);  
+    const authState = useSelector(store => store.auth);
+    const token = authState.user.token;
     const statusHandler = async(status,id) => {
        try { 
         axios.defaults.withCredentials = true;
-        const res = await axios.post(`${APPLICATION_API_END_POINT}/status/${id}/update`,{status});
+        const res = await axios.post(`${APPLICATION_API_END_POINT}/status/${id}/update`, {status},
+            {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+            },
+        );
         console.log(res);
         if(res.data.success){
             toast.success(res.data.message);

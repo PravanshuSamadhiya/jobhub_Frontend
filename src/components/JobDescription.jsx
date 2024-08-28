@@ -16,10 +16,17 @@ const JobDescription = () => {
     const { user } = useSelector(store => store.auth);
     const isInitiallyApplied = singleJob?.applications?.some(application => application?.applicants === user?._id) || false;
     const [isApplied, setIsApplied] = useState(isInitiallyApplied);
-
+    const authState = useSelector(store => store.auth);
+    const token = authState.user.token;
     const applyNowFunction = async () => {
         try {
-            const res = await axios.get(`${APPLICATION_API_END_POINT}/apply/${jobId}`, { withCredentials: true });
+            const res = await axios.get(`${APPLICATION_API_END_POINT}/apply/${jobId}`, 
+                {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    },
+                },
+                { withCredentials: true });
             if (res.data.success) {
                 setIsApplied(true);
                 const updatedSingleJob = { ...singleJob, applications: [...singleJob.applications, { applicants: user?._id }] };
@@ -32,19 +39,26 @@ const JobDescription = () => {
         }
     }
 
-    useEffect(() => {
+    useEffect(()=>{
         const fetchSingleJob = async () => {
             try {
-                const res = await axios.get(`${JOB_API_END_POINT}/get/${jobId}`, { withCredentials: true });
-                if (res.data.success) {
+                const res = await axios.get(`${JOB_API_END_POINT}/get/${jobId}`,
+                    {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        },
+                    },
+                    {withCredentials:true});
+                if(res.data.success){
                     dispatch(setSingleJob(res.data.job));
+                    setIsApplied(res.data.job.applications.some(application=>application.applicant === user?._id)) // Ensure the state is in sync with fetched data
                 }
             } catch (error) {
                 console.log(error);
             }
         }
-        fetchSingleJob();
-    }, [jobId, dispatch, user?._id]);
+        fetchSingleJob(); 
+    },[jobId,dispatch, user?._id]);
 
     return (
         <div className='max-w-7xl mx-auto my-10'>

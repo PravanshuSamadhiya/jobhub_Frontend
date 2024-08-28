@@ -16,19 +16,24 @@ const Navbar = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-
     const logoutHandler = async (e) => {
         try {
-            const res = await axios.get(`${USER_API_END_POINT}/logout`, { withCredentials: true })
+            const res = await axios.get(`${USER_API_END_POINT}/logOut`, { withCredentials: true });
+               console.log(res);
             if (res.data.success) {
                 dispatch(setUser(null));
+                
                 navigate("/");
                 toast.success(res.data.message);
-
+            } else {
+                throw new Error('Logout failed, unexpected response structure.');
             }
         } catch (error) {
             console.log(error);
-            toast.error(error.response.data.message);
+            const errorMessage = error.response && error.response.data && error.response.data.message
+                ? error.response.data.message
+                : 'An error occurred during logout';
+            toast.error(errorMessage);
         }
     }
 

@@ -16,6 +16,7 @@ const CompanyInfo = () => {
     const params = useParams();
     console.log(params.id)
     userGetCompanyById(params.id)
+
     const [input, setInput] = useState({
         name: "",
         description: "",
@@ -26,7 +27,8 @@ const CompanyInfo = () => {
     const {singleCompany} = useSelector(store=>store.company);
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
-
+    const authState = useSelector(store => store.auth);
+     const token = authState.user.token;
     const changeEventHandler = (e) => {
         setInput({ ...input, [e.target.name]: e.target.value });
     }
@@ -50,7 +52,8 @@ const CompanyInfo = () => {
             setLoading(true);
             const res = await axios.put(`${COMPANY_API_END_POINT}/update/${params.id}`, formData, {
                 headers: {
-                    'Content-Type': 'multipart/form-data'
+                    'Content-Type': 'multipart/form-data',
+                     'Authorization': `Bearer ${token}`
                 },
                 withCredentials: true
             });
